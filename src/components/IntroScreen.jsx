@@ -11,7 +11,7 @@ export default function IntroScreen({ onStart, audioEnabled, onToggleAudio }) {
     <div className="intro-screen">
       {/* Curriculum badge */}
       <div className="intro-badge">
-        ✨ Singapore MOE Curriculum · Grade 1
+        ✨· Grade 1 Maths
       </div>
 
       {/* Title */}
