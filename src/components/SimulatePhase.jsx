@@ -237,7 +237,7 @@ function Station3({ audioEnabled, onNext }) {
 
 /* Station 4: Expanded Form Matching */
 function Station4({ audioEnabled, onComplete }) {
-  const nums = [35, 72, 148, 263, 507, 1425];
+  const nums = [35, 72, 148, 263];
   const [selected, setSelected] = useState(null);
   const [matched, setMatched] = useState([]);
   const [cards] = useState(() => {
@@ -246,6 +246,7 @@ function Station4({ audioEnabled, onComplete }) {
     return [...numerals, ...expanded].sort(() => Math.random() - 0.5);
   });
   const [wrongPair, setWrongPair] = useState(null);
+  const allMatched = matched.length === nums.length;
 
   const handleClick = (card, idx) => {
     if (matched.includes(card.num)) return;
@@ -253,9 +254,14 @@ function Station4({ audioEnabled, onComplete }) {
     if (selected.idx === idx) { setSelected(null); return; }
     if (selected.type === card.type) { setSelected({ ...card, idx }); return; }
     if (selected.num === card.num) {
-      setMatched(m => [...m, card.num]);
+      const newMatched = [...matched, card.num];
+      setMatched(newMatched);
       speak(`${card.num}, ${expandedForm(card.num)}`, audioEnabled);
       setSelected(null);
+      // Auto-complete when all matched
+      if (newMatched.length === nums.length) {
+        setTimeout(() => onComplete(), 1200);
+      }
     } else {
       setWrongPair([selected.idx, idx]);
       setTimeout(() => setWrongPair(null), 500);
@@ -280,14 +286,24 @@ function Station4({ audioEnabled, onComplete }) {
       <p style={{ marginTop: 12, color: 'var(--text-muted)', fontSize: '0.85rem' }}>
         Matched: {matched.length} / {nums.length}
       </p>
-      {matched.length === nums.length && (
-        <button className="btn btn-green btn-lg" onClick={onComplete} style={{ marginTop: 16, animation: 'bounceIn 0.5s ease' }}>
-          🎉 Complete Simulation!
-        </button>
+      {allMatched && (
+        <div style={{ animation: 'bounceIn 0.5s ease', marginTop: 16 }}>
+          <div style={{ fontSize: '2rem', marginBottom: 8 }}>🎉</div>
+          <p style={{ color: 'var(--gold)', fontFamily: 'var(--font-display)', fontSize: '1.1rem', marginBottom: 12 }}>
+            All matched! Great job!
+          </p>
+          <button className="btn btn-green btn-lg" onClick={onComplete}>
+            ✅ Continue to Play Phase →
+          </button>
+        </div>
       )}
-      {matched.length < nums.length && (
-        <button className="skip-link" onClick={onComplete} style={{ marginTop: 12, display: 'block', margin: '12px auto 0' }}>
-          Skip →
+      {!allMatched && (
+        <button
+          className="btn btn-outline btn-sm"
+          onClick={onComplete}
+          style={{ marginTop: 16 }}
+        >
+          Skip to Play →
         </button>
       )}
     </div>
@@ -296,7 +312,17 @@ function Station4({ audioEnabled, onComplete }) {
 
 export default function SimulatePhase({ onComplete, audioEnabled }) {
   const [station, setStation] = useState(0);
-  const nextStation = useCallback(() => { if (station < 3) setStation(s => s + 1); }, [station]);
+
+  const nextStation = useCallback(() => {
+    setStation(s => {
+      if (s < 3) return s + 1;
+      return s;
+    });
+  }, []);
+
+  const handleComplete = useCallback(() => {
+    if (onComplete) onComplete();
+  }, [onComplete]);
 
   return (
     <div className="simulate-phase">
@@ -316,7 +342,7 @@ export default function SimulatePhase({ onComplete, audioEnabled }) {
         {station === 0 && <Station1 audioEnabled={audioEnabled} onNext={nextStation} />}
         {station === 1 && <Station2 audioEnabled={audioEnabled} onNext={nextStation} />}
         {station === 2 && <Station3 audioEnabled={audioEnabled} onNext={nextStation} />}
-        {station === 3 && <Station4 audioEnabled={audioEnabled} onComplete={onComplete} />}
+        {station === 3 && <Station4 audioEnabled={audioEnabled} onComplete={handleComplete} />}
       </div>
     </div>
   );
