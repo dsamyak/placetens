@@ -145,8 +145,10 @@ function genMatchNumeralWord(id, difficulty) {
   const r = getRangeForDifficulty(difficulty);
   const pairs = [];
   const used = new Set();
-  while (pairs.length < 4) {
-    const n = randInRange(r.min, Math.min(r.max, 999));
+  let attempts = 0;
+  while (pairs.length < 4 && attempts < 200) {
+    attempts++;
+    const n = randInRange(r.min, r.max);
     if (!used.has(n)) { used.add(n); pairs.push({ numeral: String(n), word: numberToWord(n) }); }
   }
   return {
