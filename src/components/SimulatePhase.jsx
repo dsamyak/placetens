@@ -260,7 +260,9 @@ function Station4({ audioEnabled, onComplete }) {
       setSelected(null);
       // Auto-complete when all matched
       if (newMatched.length === nums.length) {
-        setTimeout(() => onComplete(), 1200);
+        setTimeout(() => {
+          if (typeof onComplete === 'function') onComplete();
+        }, 1200);
       }
     } else {
       setWrongPair([selected.idx, idx]);
@@ -292,7 +294,7 @@ function Station4({ audioEnabled, onComplete }) {
           <p style={{ color: 'var(--gold)', fontFamily: 'var(--font-display)', fontSize: '1.1rem', marginBottom: 12 }}>
             All matched! Great job!
           </p>
-          <button className="btn btn-green btn-lg" onClick={onComplete}>
+          <button className="btn btn-green btn-lg" onClick={() => onComplete()}>
             ✅ Continue to Play Phase →
           </button>
         </div>
@@ -300,7 +302,7 @@ function Station4({ audioEnabled, onComplete }) {
       {!allMatched && (
         <button
           className="btn btn-outline btn-sm"
-          onClick={onComplete}
+          onClick={() => onComplete()}
           style={{ marginTop: 16 }}
         >
           Skip to Play →
@@ -321,7 +323,9 @@ export default function SimulatePhase({ onComplete, audioEnabled }) {
   }, []);
 
   const handleComplete = useCallback(() => {
-    if (onComplete) onComplete();
+    if (typeof onComplete === 'function') {
+      onComplete();
+    }
   }, [onComplete]);
 
   return (

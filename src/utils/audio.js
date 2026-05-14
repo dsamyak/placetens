@@ -1,12 +1,16 @@
 // Web Speech API for text-to-speech
 export function speak(text, enabled = true) {
   if (!enabled || !window.speechSynthesis) return;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.85;
-  utterance.pitch = 1.1;
-  utterance.lang = 'en-SG';
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utterance);
+  try {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.85;
+    utterance.pitch = 1.1;
+    utterance.lang = 'en-SG';
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  } catch (e) {
+    console.warn("Speech synthesis error:", e);
+  }
 }
 
 // Simple tone generation using AudioContext
