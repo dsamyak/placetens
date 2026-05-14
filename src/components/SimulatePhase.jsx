@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { numberToWord, expandedForm } from '../utils/numberWords';
 import { speak } from '../utils/audio';
 
@@ -258,12 +258,6 @@ function Station4({ audioEnabled, onComplete }) {
       setMatched(newMatched);
       speak(`${card.num}, ${expandedForm(card.num)}`, audioEnabled);
       setSelected(null);
-      // Auto-complete when all matched
-      if (newMatched.length === nums.length) {
-        setTimeout(() => {
-          if (typeof onComplete === 'function') onComplete();
-        }, 1200);
-      }
     } else {
       setWrongPair([selected.idx, idx]);
       setTimeout(() => setWrongPair(null), 500);
@@ -294,39 +288,49 @@ function Station4({ audioEnabled, onComplete }) {
           <p style={{ color: 'var(--gold)', fontFamily: 'var(--font-display)', fontSize: '1.1rem', marginBottom: 12 }}>
             All matched! Great job!
           </p>
-          <button className="btn btn-green btn-lg" onClick={() => onComplete()}>
-            ✅ Continue to Play Phase →
-          </button>
         </div>
       )}
-      {!allMatched && (
-        <button
-          className="btn btn-outline btn-sm"
-          onClick={() => onComplete()}
-          style={{ marginTop: 16 }}
-        >
-          Skip to Play →
-        </button>
-      )}
+      <button
+        className={allMatched ? "btn btn-green btn-lg" : "btn btn-outline btn-sm"}
+        onClick={() => {
+          console.log('[Station4] Continue/Skip clicked, calling onComplete');
+          onComplete();
+        }}
+        style={{ marginTop: 16, position: 'relative', zIndex: 10 }}
+      >
+        {allMatched ? '✅ Continue to Play Phase →' : 'Skip to Play →'}
+      </button>
     </div>
   );
 }
 
 export default function SimulatePhase({ onComplete, audioEnabled }) {
   const [station, setStation] = useState(0);
+  const completedRef = useRef(false);
 
-  const nextStation = useCallback(() => {
-    setStation(s => {
-      if (s < 3) return s + 1;
-      return s;
+  // Direct function — no useCallback to avoid stale closures
+  function goToNextStation() {
+    setStation(prev => {
+      if (prev < 3) return prev + 1;
+      return prev;
     });
-  }, []);
+  }
 
-  const handleComplete = useCallback(() => {
+  function handleFinalComplete() {
+    console.log('[SimulatePhase] handleFinalComplete called, completedRef:', completedRef.current);
+    // Guard against double-calls
+    if (completedRef.current) {
+      console.log('[SimulatePhase] Already completed, skipping');
+      return;
+    }
+    completedRef.current = true;
+    console.log('[SimulatePhase] Calling onComplete prop');
     if (typeof onComplete === 'function') {
       onComplete();
+    } else {
+      console.error('[SimulatePhase] onComplete is not a function!', onComplete);
     }
-  }, [onComplete]);
+  }
 
   return (
     <div className="simulate-phase">
@@ -343,11 +347,20 @@ export default function SimulatePhase({ onComplete, audioEnabled }) {
         ))}
       </div>
       <div className="glass-card" style={{ maxWidth: 800, width: '100%', animation: 'slideUp 0.4s ease' }}>
-        {station === 0 && <Station1 audioEnabled={audioEnabled} onNext={nextStation} />}
-        {station === 1 && <Station2 audioEnabled={audioEnabled} onNext={nextStation} />}
-        {station === 2 && <Station3 audioEnabled={audioEnabled} onNext={nextStation} />}
-        {station === 3 && <Station4 audioEnabled={audioEnabled} onComplete={handleComplete} />}
+        {station === 0 && <Station1 audioEnabled={audioEnabled} onNext={goToNextStation} />}
+        {station === 1 && <Station2 audioEnabled={audioEnabled} onNext={goToNextStation} />}
+        {station === 2 && <Station3 audioEnabled={audioEnabled} onNext={goToNextStation} />}
+        {station === 3 && <Station4 audioEnabled={audioEnabled} onComplete={handleFinalComplete} />}
       </div>
+
+      {/* Always-visible skip button at the bottom */}
+      <button
+        className="btn btn-outline btn-sm"
+        onClick={handleFinalComplete}
+        style={{ marginTop: 20, opacity: 0.7 }}
+      >
+        Skip Simulation →
+      </button>
     </div>
   );
 }
