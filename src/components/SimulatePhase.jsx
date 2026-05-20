@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { numberToWord, expandedForm } from '../utils/numberWords';
-import { speak } from '../utils/audio';
+import { speak, stopNarration, narrate, preloadNarration } from '../utils/audio';
+import { simulateStationNarration } from '../utils/narration';
 
 const STATIONS = [
   { id: 0, title: 'Tens & Ones', subtitle: 'Build 2-digit numbers', icon: '🧱' },
@@ -308,8 +309,19 @@ export default function SimulatePhase({ onComplete, audioEnabled }) {
   const [station, setStation] = useState(0);
   const completedRef = useRef(false);
 
+  // Play station intro narration when station changes
+  useEffect(() => {
+    const segments = simulateStationNarration(station);
+    if (segments.length > 0 && audioEnabled) {
+      preloadNarration(segments);
+      narrate(segments, true);
+    }
+    return () => stopNarration();
+  }, [station, audioEnabled]);
+
   // Direct function — no useCallback to avoid stale closures
   function goToNextStation() {
+    stopNarration();
     setStation(prev => {
       if (prev < 3) return prev + 1;
       return prev;
@@ -324,6 +336,7 @@ export default function SimulatePhase({ onComplete, audioEnabled }) {
       return;
     }
     completedRef.current = true;
+    stopNarration();
     console.log('[SimulatePhase] Calling onComplete prop');
     if (typeof onComplete === 'function') {
       onComplete();

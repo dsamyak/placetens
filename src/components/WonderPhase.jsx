@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { speak } from '../utils/audio';
+import { speak, narrate, stopNarration, preloadNarration } from '../utils/audio';
+import { wonderNarration } from '../utils/narration';
 
 const WONDER_QUESTIONS = [
   {
@@ -38,6 +39,7 @@ export default function WonderPhase({ onComplete, audioEnabled }) {
   const [wonder] = useState(() => WONDER_QUESTIONS[Math.floor(Math.random() * WONDER_QUESTIONS.length)]);
   const [stage, setStage] = useState(0); // 0=intro, 1=question revealed, 2=sparkle
   const [particles, setParticles] = useState([]);
+  const [isNarrating, setIsNarrating] = useState(false);
 
   useEffect(() => {
     // Generate floating particles
@@ -53,23 +55,46 @@ export default function WonderPhase({ onComplete, audioEnabled }) {
     setParticles(p);
   }, [wonder]);
 
+  // Auto-start narration when phase loads
   useEffect(() => {
-    // Auto-reveal stages
-    const t1 = setTimeout(() => setStage(1), 800);
-    const t2 = setTimeout(() => setStage(2), 2000);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, []);
+    const segments = wonderNarration(wonder.question);
 
-  useEffect(() => {
-    if (stage === 1 && audioEnabled) {
-      speak(wonder.question, true);
-    }
-  }, [stage, wonder.question, audioEnabled]);
+    // Preload all segments immediately
+    preloadNarration(segments);
+
+    // Start narration after a brief delay for visual entrance
+    const timer = setTimeout(async () => {
+      setStage(1); // Reveal question card visually
+
+      if (audioEnabled) {
+        setIsNarrating(true);
+        await narrate(segments, true, {
+          onSegmentStart: (seg, idx) => {
+            // When the question segment starts, ensure card is visible
+            if (idx === 1) setStage(1);
+          },
+          onSegmentEnd: (seg, idx) => {
+            // After the last segment, show the Discover button
+            if (idx === segments.length - 1) setStage(2);
+          },
+        });
+        setIsNarrating(false);
+      } else {
+        // No audio — just reveal stages on timers
+        setTimeout(() => setStage(2), 1200);
+      }
+    }, 800);
+
+    return () => {
+      clearTimeout(timer);
+      stopNarration();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDiscover = useCallback(() => {
-    if (audioEnabled) speak("Let's find out together!", true);
-    setTimeout(() => onComplete(), 600);
-  }, [onComplete, audioEnabled]);
+    stopNarration();
+    onComplete();
+  }, [onComplete]);
 
   return (
     <div className="wonder-phase">
@@ -115,7 +140,7 @@ export default function WonderPhase({ onComplete, audioEnabled }) {
           <p className="wonder-subtext">{wonder.subtext}</p>
         </div>
 
-        {/* Discover button */}
+        {/* Discover button — appears after narration completes */}
         <button
           className={`btn btn-wonder ${stage >= 2 ? 'visible' : ''}`}
           onClick={handleDiscover}
@@ -125,6 +150,17 @@ export default function WonderPhase({ onComplete, audioEnabled }) {
           Let's Discover!
           <span className="wonder-btn-sparkle">✨</span>
         </button>
+
+        {/* Skip narration button — visible while narrating */}
+        {isNarrating && (
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => { stopNarration(); setStage(2); setIsNarrating(false); }}
+            style={{ marginTop: 12, opacity: 0.7 }}
+          >
+            Skip ⏭
+          </button>
+        )}
       </div>
     </div>
   );

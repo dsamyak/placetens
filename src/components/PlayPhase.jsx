@@ -1,6 +1,7 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { generateQuestionBank } from '../utils/questionBank';
-import { speak, sounds } from '../utils/audio';
+import { speak, sounds, stopNarration, narrate, preloadNarration } from '../utils/audio';
+import { playWorldNarration } from '../utils/narration';
 import QuestionRenderer from './QuestionRenderer';
 
 const WORLDS = [
@@ -47,7 +48,7 @@ export default function PlayPhase({ onComplete, audioEnabled }) {
 
   const q = worldQuestions[qIndex];
 
-  const startWorld = useCallback((worldId) => {
+  const startWorld = useCallback(async (worldId) => {
     setCurrentWorld(worldId);
     setQIndex(0);
     setScore(0);
@@ -56,7 +57,13 @@ export default function PlayPhase({ onComplete, audioEnabled }) {
     setWorldComplete(false);
     setFeedback(null);
     setAnswered(false);
-    if (audioEnabled) speak(`Welcome to ${WORLDS[worldId].name}!`, true);
+
+    // Play world welcome narration with sync
+    if (audioEnabled) {
+      const segments = playWorldNarration(WORLDS[worldId].name);
+      preloadNarration(segments);
+      narrate(segments, true);
+    }
   }, [audioEnabled]);
 
   const finishWorld = useCallback(() => {
@@ -68,12 +75,14 @@ export default function PlayPhase({ onComplete, audioEnabled }) {
   }, [currentWorld, score]);
 
   const backToMap = useCallback(() => {
+    stopNarration();
     setCurrentWorld(-1);
     setWorldComplete(false);
     setFeedback(null);
   }, []);
 
   const handleAllComplete = useCallback(() => {
+    stopNarration();
     const totalScore = Object.values(worldResults).reduce((a, r) => a + r.score, 0) + score;
     const totalQ = Object.values(worldResults).reduce((a, r) => a + r.total, 0) + (worldQuestions.length || 0);
     onComplete({
@@ -120,6 +129,13 @@ export default function PlayPhase({ onComplete, audioEnabled }) {
       }
     }
   }, [streak, q, advance, lives, finishWorld]);
+
+  // Read question text aloud when a new question appears
+  useEffect(() => {
+    if (q && audioEnabled && currentWorld >= 0 && !worldComplete) {
+      speak(q.questionText, true, 'question');
+    }
+  }, [qIndex, q, audioEnabled, currentWorld, worldComplete]);
 
   // World Map View
   if (currentWorld < 0) {

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { numberToWord, expandedForm, decompose } from '../utils/numberWords';
-import { speak, sounds } from '../utils/audio';
+import { speak, sounds, stopNarration, narrate, preloadNarration } from '../utils/audio';
+import { reflectNarration, celebrationNarration } from '../utils/narration';
 
 const REFLECT_QUESTIONS = [
   { q: "What does the digit 5 mean in the number 52?", options: [
@@ -40,6 +41,16 @@ export default function ReflectPhase({ stats, onRestart, onGoHome, audioEnabled 
   const pct = totalAnswered > 0 ? Math.round((score / totalAnswered) * 100) : 0;
   const totalStars = Object.values(worldResults).reduce((a, r) => a + (r.stars || 0), 0);
 
+  // Play reflect intro narration on mount
+  useEffect(() => {
+    if (audioEnabled) {
+      const segments = reflectNarration();
+      preloadNarration(segments);
+      narrate(segments, true);
+    }
+    return () => stopNarration();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (showConfetti) {
       const pieces = Array.from({ length: 40 }, (_, i) => ({
@@ -51,13 +62,23 @@ export default function ReflectPhase({ stats, onRestart, onGoHome, audioEnabled 
     }
   }, [showConfetti]);
 
+  // Play celebration narration when reaching certificate step
+  useEffect(() => {
+    if (step === 3 && audioEnabled) {
+      const segments = celebrationNarration();
+      preloadNarration(segments);
+      narrate(segments, true);
+    }
+    return () => { if (step === 3) stopNarration(); };
+  }, [step, audioEnabled]);
+
   const handleTeachAnswer = useCallback((option) => {
     if (teachAnswered) return;
     setTeachAnswered(true);
     if (option.correct) {
       setTeachCorrect(c => c + 1);
       sounds.correct();
-      if (audioEnabled) speak('Great explanation!', true);
+      speak('Great explanation!', audioEnabled, 'celebration');
     } else { sounds.wrong(); }
     setTimeout(() => {
       setTeachAnswered(false);
@@ -68,7 +89,7 @@ export default function ReflectPhase({ stats, onRestart, onGoHome, audioEnabled 
 
   const handleFavSelect = useCallback((num) => {
     setFavNum(num);
-    if (audioEnabled) speak(`${num}, ${numberToWord(num)}`, true);
+    speak(`${num}, ${numberToWord(num)}`, audioEnabled);
   }, [audioEnabled]);
 
   const handleConfidenceSelect = useCallback((idx) => {
@@ -236,8 +257,8 @@ export default function ReflectPhase({ stats, onRestart, onGoHome, audioEnabled 
           </div>
         </div>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginTop: 24 }}>
-          <button className="btn btn-primary btn-lg" onClick={onRestart}>🔄 Play Again</button>
-          <button className="btn btn-secondary" onClick={onGoHome}>🏠 Home</button>
+          <button className="btn btn-primary btn-lg" onClick={() => { stopNarration(); onRestart(); }}>🔄 Play Again</button>
+          <button className="btn btn-secondary" onClick={() => { stopNarration(); onGoHome(); }}>🏠 Home</button>
         </div>
       </div>
     </div>

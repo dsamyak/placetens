@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { speak } from '../utils/audio';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { speak, stopNarration, preloadNarration } from '../utils/audio';
+import { storyNarration } from '../utils/narration';
 
 const STORY_SLIDES = [
   {
@@ -37,29 +38,66 @@ export default function StoryPhase({ onComplete, audioEnabled }) {
   const [anim, setAnim] = useState(false);
   const [textVis, setTextVis] = useState(false);
   const [hlVis, setHlVis] = useState(false);
+  const [isNarrating, setIsNarrating] = useState(false);
+  const narrationSegments = useRef(storyNarration());
   const s = STORY_SLIDES[slide];
   const isLast = slide === STORY_SLIDES.length - 1;
   const pct = ((slide + 1) / STORY_SLIDES.length) * 100;
 
+  // Preload all story narration on mount
   useEffect(() => {
-    setTextVis(false); setHlVis(false);
-    const t1 = setTimeout(() => setTextVis(true), 400);
-    const t2 = setTimeout(() => setHlVis(true), 1800);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [slide]);
+    preloadNarration(narrationSegments.current);
+  }, []);
 
+  // Play narration for the current slide when it changes
   useEffect(() => {
-    if (textVis && audioEnabled) speak(s.text, true);
-  }, [textVis, s.text, audioEnabled]);
+    setTextVis(false);
+    setHlVis(false);
+
+    const t1 = setTimeout(() => setTextVis(true), 400);
+
+    let cancelled = false;
+
+    const playSlideNarration = async () => {
+      // Wait for text to be visible
+      await new Promise(r => setTimeout(r, 500));
+      if (cancelled) return;
+
+      setIsNarrating(true);
+
+      const segment = narrationSegments.current[slide];
+      if (segment && audioEnabled) {
+        await speak(segment.text, true, segment.style);
+      }
+
+      if (cancelled) return;
+      setIsNarrating(false);
+
+      // After narration finishes, show the highlight
+      setHlVis(true);
+    };
+
+    playSlideNarration();
+
+    return () => {
+      cancelled = true;
+      stopNarration();
+      clearTimeout(t1);
+    };
+  }, [slide, audioEnabled]);
 
   const goNext = useCallback(() => {
     if (anim) return;
+    stopNarration();
+    setIsNarrating(false);
     setAnim(true);
     setTimeout(() => { isLast ? onComplete() : setSlide(i => i + 1); setAnim(false); }, 400);
   }, [anim, isLast, onComplete]);
 
   const goPrev = useCallback(() => {
     if (anim || slide === 0) return;
+    stopNarration();
+    setIsNarrating(false);
     setAnim(true);
     setTimeout(() => { setSlide(i => i - 1); setAnim(false); }, 400);
   }, [anim, slide]);
@@ -93,7 +131,7 @@ export default function StoryPhase({ onComplete, audioEnabled }) {
           {STORY_SLIDES.map((_, i) => (<div key={i} className={`story-dot ${i === slide ? 'active' : i < slide ? 'completed' : ''}`} />))}
         </div>
         <button className={`btn ${isLast ? 'btn-green' : 'btn-primary'} btn-sm`} onClick={goNext}>
-          {isLast ? "🚀 Let's Explore!" : 'Next →'}
+          {isNarrating ? 'Skip ⏭' : isLast ? "🚀 Let's Explore!" : 'Next →'}
         </button>
       </div>
     </div>

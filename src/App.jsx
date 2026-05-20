@@ -6,6 +6,7 @@ import SimulatePhase from './components/SimulatePhase';
 import PlayPhase from './components/PlayPhase';
 import ReflectPhase from './components/ReflectPhase';
 import FloatingNumbers from './components/FloatingNumbers';
+import { unlockAudioContext, stopNarration } from './utils/audio';
 
 const PHASES = [
   { id: 'wonder', label: 'Wonder', icon: '🔍', num: '01' },
@@ -26,19 +27,41 @@ export default function App() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [playStats, setPlayStats] = useState(null);
 
-  const goHome = useCallback(() => setPhase('intro'), []);
+  const goHome = useCallback(() => {
+    stopNarration();
+    setPhase('intro');
+  }, []);
 
-  const handleWonderComplete = useCallback(() => setPhase('story'), []);
-  const handleStoryComplete = useCallback(() => setPhase('simulate'), []);
-  const handleSimulateComplete = useCallback(() => setPhase('play'), []);
+  const handleStart = useCallback(() => {
+    // Unlock audio context on the very first user interaction
+    unlockAudioContext();
+    setPhase('wonder');
+  }, []);
+
+  const handleWonderComplete = useCallback(() => {
+    stopNarration();
+    setPhase('story');
+  }, []);
+
+  const handleStoryComplete = useCallback(() => {
+    stopNarration();
+    setPhase('simulate');
+  }, []);
+
+  const handleSimulateComplete = useCallback(() => {
+    stopNarration();
+    setPhase('play');
+  }, []);
 
   const handlePlayComplete = useCallback((stats) => {
+    stopNarration();
     setPlayStats(stats);
     saveProgress({ phase: 'reflect', stats });
     setPhase('reflect');
   }, []);
 
   const handleRestart = useCallback(() => {
+    stopNarration();
     localStorage.removeItem(STORAGE_KEY);
     setPhase('intro');
     setPlayStats(null);
@@ -86,7 +109,7 @@ export default function App() {
         {/* Phases */}
         {phase === 'intro' && (
           <IntroScreen
-            onStart={() => setPhase('wonder')}
+            onStart={handleStart}
             audioEnabled={audioEnabled}
             onToggleAudio={() => setAudioEnabled(a => !a)}
           />
