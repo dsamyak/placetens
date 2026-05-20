@@ -1,12 +1,13 @@
-# Number Bonds Audio & Narration Pipeline
+# Place Value Audio & Narration Pipeline
 
-This document outlines the architecture and workflow of the custom text-to-speech audio narration pipeline used in the Number Bonds for Subtraction educational module. The system is designed to provide high-quality, perfectly synchronized, and emotionally resonant narration using ElevenLabs.
+This document outlines the architecture and workflow of the custom text-to-speech audio narration pipeline used in the Place Value Tens and Ones educational module. The system is designed to provide high-quality, perfectly synchronized, and emotionally resonant narration using ElevenLabs exclusively.
 
 ## Overview
-The application utilizes a hybrid audio pipeline:
-1. **Pre-generation:** Known educational scripts are pre-generated offline using a Node.js script and stored as static `.mp3` assets to ensure zero-latency playback on low-end devices.
-2. **Dynamic Fallback:** If a text string hasn't been pre-generated, the system can fall back to requesting it on-the-fly via the ElevenLabs API.
-3. **Synchronization:** The frontend audio engine parses an array of segments, eagerly preloading upcoming segments to eliminate latency gaps between sentences.
+The application utilizes an ElevenLabs-only audio pipeline:
+1. **Pre-generation:** Known educational scripts (phase paragraphs and questions) are pre-generated offline using a Node.js script and stored as static `.mp3` assets to ensure zero-latency playback on all devices. Note that to save bandwidth and generation time, individual numbers (1-99) are typically *not* pre-generated in bulk.
+2. **Dynamic Generation:** If a text string hasn't been pre-generated (e.g., dynamically generated questions during Play Phase, or numbers), the system generates it on-the-fly via the ElevenLabs API, provided a valid `VITE_ELEVENLABS_API_KEY` is present.
+3. **No Browser Fallback:** To maintain a consistent, premium experience, there is *no* fallback to the browser's built-in Web Speech API. If an audio file is missing and no API key is provided, the engine simply skips narration silently so the user can continue without robotic voices.
+4. **Synchronization:** The frontend audio engine parses an array of segments, eagerly preloading upcoming segments to eliminate latency gaps between sentences.
 
 ---
 
@@ -30,7 +31,7 @@ Different **speech styles** map to specific ElevenLabs emotional settings (`stab
 ## 2. Pipeline Components
 
 ### A. Offline Generation (`scripts/generate_audio.js`)
-This script automates the creation of static audio files for all predefined narration. 
+This script automates the creation of static audio files for major phase narrations (paragraphs, main questions, UI messages). 
 - It reads an array of `phrases` containing the exact `text` and intended `style`.
 - Hits the direct ElevenLabs text-to-speech API utilizing the local `.env.local` variable `VITE_ELEVENLABS_API_KEY`.
 - Saves the resulting `.mp3` files into `public/assets/audio/`.
@@ -39,7 +40,7 @@ This script automates the creation of static audio files for all predefined narr
 ### B. Audio Mapping (`src/utils/audioMap.js`)
 This file is an auto-generated JavaScript module that exports a dictionary (`audioMap`). 
 - **Key:** The exact string of text to be spoken.
-- **Value:** The relative path to the pre-generated `.mp3` file (e.g., `/assets/audio/audio_welcome_to_number_..._0.mp3`).
+- **Value:** The relative path to the pre-generated `.mp3` file (e.g., `/assets/audio/audio_welcome_to_place_..._0.mp3`).
 - The frontend uses this to perform an exact match and bypass dynamic generation entirely.
 
 ### C. Audio Cleanup (`scripts/clean_audio.js`)
@@ -55,8 +56,8 @@ This module maps application phases (Intro, Wonder, Story, Simulate, Play, Refle
 ### E. Frontend Audio Engine (`src/utils/audio.js`)
 The core playback engine (`getAudioUrl`, `speak`, `narrate`, `preloadNarration`).
 1. **Cache check:** It first checks `audioMap[text]`. If found, it immediately resolves the static asset URL.
-2. **Dynamic Request:** If not found, it attempts to fetch the audio dynamically through `/api/elevenlabs` or directly to ElevenLabs, utilizing an internal memory cache (`elevenLabsCache`).
-3. **Playback:** Uses HTML5 `Audio` API.
+2. **Dynamic Request:** If not found and an API key is present, it attempts to fetch the audio dynamically directly from ElevenLabs, utilizing an internal memory cache (`elevenLabsCache`).
+3. **Playback:** Uses HTML5 `Audio` API (`new Audio()`).
 4. **Preloading:** While playing segment `i`, it preemptively calls `getAudioUrl` for segment `i+1` so the asset is downloaded and ready exactly when the previous segment ends, guaranteeing seamless narration.
 
 ---
