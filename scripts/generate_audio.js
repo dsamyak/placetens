@@ -25,46 +25,52 @@ if (!API_KEY || API_KEY === 'your_api_key_here') {
 
 const VOICE_ID = 'Xb7hH8MSUJpSbSDYk0k2'; // Alice
 
-// Helper to get number words for 1-99
-const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
-const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-
-function numberToWord(num) {
-  if (num === 0) return 'zero';
-  if (num < 10) return ones[num];
-  if (num < 20) return teens[num - 10];
-  const t = Math.floor(num / 10);
-  const o = num % 10;
-  return `${tens[t]}${o > 0 ? '-' + ones[o] : ''}`;
-}
-
 const phrases = [
+  // Intro Phase
   { text: "Welcome to Place Value Tens and Ones!", style: 'encouragement' },
-  { text: "Let's find out together!", style: 'encouragement' },
-  { text: "Great explanation!", style: 'celebration' },
-  { text: "Welcome to Base 10 Blocks!", style: 'encouragement' },
-  { text: "Welcome to Tens and Ones!", style: 'encouragement' },
-  { text: "Welcome to Expanded Form!", style: 'encouragement' },
-  { text: "Welcome to Word Form!", style: 'encouragement' }
-];
+  { text: "Ready to discover the secret of numbers?", style: 'statement' },
+  { text: "Join Wei Ming on a journey to understand place value.", style: 'statement' },
+  { text: "How every digit in a number has its own special position and value!", style: 'statement' },
 
-// Add 1-99 numbers
-for (let i = 1; i <= 99; i++) {
-  const word = numberToWord(i);
-  phrases.push({ text: word, style: 'statement' });
-  
-  // For simulate phase: "34, 30 + 4"
-  const t = Math.floor(i / 10) * 10;
-  const o = i % 10;
-  if (t > 0 && o > 0) {
-    phrases.push({ text: `${i}, ${t} + ${o}`, style: 'statement' });
-  } else if (t > 0) {
-    phrases.push({ text: `${i}, ${t}`, style: 'statement' });
-  } else {
-    phrases.push({ text: `${i}, ${o}`, style: 'statement' });
-  }
-}
+  // Wonder Phase
+  { text: "Hmm, I wonder...", style: 'thinking' },
+  { text: "Let's find out together!", style: 'encouragement' },
+  { text: "Why does the '3' in 30 mean something different from the '3' in 3?", style: 'question' },
+  { text: "If you swap the digits of 35 to make 53, why does the number get bigger?", style: 'question' },
+  { text: "How can you build the number 247 using only tens sticks and unit cubes?", style: 'question' },
+  { text: "Why is the number 1000 written with four digits, but it means just one thousand?", style: 'question' },
+  { text: "If you have 4 hundreds, 2 tens, and 5 ones, what treasure number have you created?", style: 'question' },
+
+  // Story Phase
+  { text: "One morning, Wei Ming looked at the school building. Our classroom is on floor 3, he said. But on the noticeboard, he saw the number 30. Wait, why does the 3 in 30 mean something different from the 3 in floor 3?", style: 'statement' },
+  { text: "After school, Wei Ming went to the market. The stall uncle was selling ice cream sticks. I bundle them in groups of 10, he explained. So 4 bundles and 7 loose sticks means you have 47 sticks!", style: 'statement' },
+  { text: "The next day, his teacher Mrs Lim brought out special blocks. This flat square has 100 tiny cubes! A long stick has 10 cubes. And this small cube is just 1. She built 253, 2 flats, 5 sticks, and 3 cubes.", style: 'statement' },
+  { text: "Now Wei Ming understood, every digit has a position, and that position gives it a special value! Ones, tens, hundreds, thousands, each place is ten times bigger than the one before.", style: 'statement' },
+
+  // Simulate Phase
+  { text: "Welcome to Tens and Ones!", style: 'encouragement' },
+  { text: "Build numbers with tens sticks and unit cubes.", style: 'statement' },
+  { text: "Welcome to Hundreds!", style: 'encouragement' },
+  { text: "Now add hundreds flats to build bigger numbers!", style: 'statement' },
+  { text: "Welcome to Thousands!", style: 'encouragement' },
+  { text: "Add thousands cubes for really big numbers!", style: 'statement' },
+  { text: "Welcome to Expanded Form!", style: 'encouragement' },
+  { text: "Match numbers to their expanded form!", style: 'statement' },
+
+  // Play Phase
+  { text: "Welcome to Tens Village!", style: 'encouragement' },
+  { text: "Welcome to Hundreds Heights!", style: 'encouragement' },
+  { text: "Welcome to Thousands Galaxy!", style: 'encouragement' },
+  { text: "Answer questions to earn stars and XP!", style: 'statement' },
+
+  // Reflect Phase
+  { text: "Let's look back at what you learned today!", style: 'statement' },
+  { text: "Can you teach the mascot about place value?", style: 'question' },
+  { text: "Amazing job!", style: 'celebration' },
+  { text: "You completed the entire journey!", style: 'celebration' },
+  { text: "You are a Place Value superstar!", style: 'encouragement' },
+  { text: "Great explanation!", style: 'celebration' }
+];
 
 const AUDIO_DIR = path.resolve(__dirname, '../public/assets/audio');
 if (!fs.existsSync(AUDIO_DIR)) {
