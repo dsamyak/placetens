@@ -1,9 +1,9 @@
 /**
  * audio.js — Core audio playback engine.
  *
- * Architecture:
+ * Architecture (ElevenLabs only — no Web Speech API):
  * 1. Check audioMap for pre-generated static .mp3 asset.
- * 2. If not found, fall back to dynamic ElevenLabs TTS via API key.
+ * 2. If not found, dynamically generate via ElevenLabs TTS API.
  * 3. Playback uses HTML5 Audio API with Promise-based completion.
  * 4. Preloading: while playing segment i, preload segment i+1.
  * 5. `narrate()` plays an array of segments sequentially with sync callbacks.
@@ -52,7 +52,7 @@ export async function getAudioUrl(text, style = 'statement') {
   // 3. Dynamic generation via ElevenLabs API
   const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
   if (!apiKey || apiKey === 'your_api_key_here') {
-    // No API key — fall back to Web Speech API silently
+    // No API key available — skip audio silently
     return null;
   }
 
@@ -87,25 +87,6 @@ export async function getAudioUrl(text, style = 'statement') {
   }
 }
 
-// ─── Web Speech Fallback ───────────────────────────────────────────────────────
-function speakWithWebSpeech(text) {
-  return new Promise((resolve) => {
-    if (!window.speechSynthesis) { resolve(); return; }
-    try {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.85;
-      utterance.pitch = 1.1;
-      utterance.lang = 'en-SG';
-      utterance.onend = () => resolve();
-      utterance.onerror = () => resolve();
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.warn('Web Speech error:', e);
-      resolve();
-    }
-  });
-}
 
 // ─── Speak ─────────────────────────────────────────────────────────────────────
 /**
@@ -144,15 +125,13 @@ export function speak(text, enabled = true, style = 'statement') {
       try {
         await audio.play();
       } catch (e) {
-        // Autoplay blocked — fall back to Web Speech
-        console.warn('Autoplay blocked, falling back to Web Speech:', e);
+        // Autoplay blocked — resolve silently
+        console.warn('Autoplay blocked:', e);
         currentAudio = null;
-        await speakWithWebSpeech(text);
         resolve();
       }
     } else {
-      // No URL available — use Web Speech fallback
-      await speakWithWebSpeech(text);
+      // No ElevenLabs URL available — resolve silently
       resolve();
     }
   });
@@ -165,9 +144,6 @@ export function stopCurrentAudio() {
     currentAudio.pause();
     currentAudio.currentTime = 0;
     currentAudio = null;
-  }
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
   }
 }
 
