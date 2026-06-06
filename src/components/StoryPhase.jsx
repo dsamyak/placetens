@@ -13,8 +13,8 @@ const STORY_SLIDES = [
   {
     image: '/images/story_market.png',
     title: 'The Bundle Discovery',
-    text: "After school, Wei Ming went to the market. The stall uncle was selling ice cream sticks. \"I bundle them in groups of 10,\" he explained. \"So 4 bundles and 7 loose sticks means you have 47 sticks!\"",
-    highlight: '"4 tens + 7 ones = 47!"',
+    text: "After school, Wei Ming went to the market. The stall uncle was selling ice cream sticks. \"I bundle them in groups of 10,\" he explained. \"So 4 bundles and 9 loose sticks means you have 49 sticks!\"",
+    highlight: '"4 tens + 9 ones = 49!"',
     mascotText: "So THAT is place value! 💡",
   },
   {

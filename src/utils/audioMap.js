@@ -11,7 +11,7 @@ export const audioMap = {
   "Why is the number 1000 written with four digits, but it means just one thousand?": "/assets/audio/audio_why_is_the_number_1000_written_9.mp3",
   "If you have 4 hundreds, 2 tens, and 5 ones, what treasure number have you created?": "/assets/audio/audio_if_you_have_4_hundreds__2_tens_10.mp3",
   "One morning, Wei Ming looked at the school building. Our classroom is on floor 3, he said. But on the noticeboard, he saw the number 30. Wait, why does the 3 in 30 mean something different from the 3 in floor 3?": "/assets/audio/audio_one_morning__wei_ming_looked_a_11.mp3",
-  "After school, Wei Ming went to the market. The stall uncle was selling ice cream sticks. I bundle them in groups of 10, he explained. So 4 bundles and 7 loose sticks means you have 47 sticks!": "/assets/audio/audio_after_school__wei_ming_went_to_12.mp3",
+  "After school, Wei Ming went to the market. The stall uncle was selling ice cream sticks. I bundle them in groups of 10, he explained. So 4 bundles and 9 loose sticks means you have 49 sticks!": "/assets/audio/audio_after_school__wei_ming_went_to_12.mp3",
   "The next day, his teacher Mrs Lim brought out special blocks. This flat square has 100 tiny cubes! A long stick has 10 cubes. And this small cube is just 1. She built 253, 2 flats, 5 sticks, and 3 cubes.": "/assets/audio/audio_the_next_day__his_teacher_mrs__13.mp3",
   "Now Wei Ming understood, every digit has a position, and that position gives it a special value! Ones, tens, hundreds, thousands, each place is ten times bigger than the one before.": "/assets/audio/audio_now_wei_ming_understood__every_14.mp3",
   "Welcome to Tens and Ones!": "/assets/audio/audio_welcome_to_tens_and_ones__15.mp3",

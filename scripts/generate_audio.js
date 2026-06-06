@@ -43,7 +43,7 @@ const phrases = [
 
   // Story Phase
   { text: "One morning, Wei Ming looked at the school building. Our classroom is on floor 3, he said. But on the noticeboard, he saw the number 30. Wait, why does the 3 in 30 mean something different from the 3 in floor 3?", style: 'statement' },
-  { text: "After school, Wei Ming went to the market. The stall uncle was selling ice cream sticks. I bundle them in groups of 10, he explained. So 4 bundles and 7 loose sticks means you have 47 sticks!", style: 'statement' },
+  { text: "After school, Wei Ming went to the market. The stall uncle was selling ice cream sticks. I bundle them in groups of 10, he explained. So 4 bundles and 9 loose sticks means you have 49 sticks!", style: 'statement' },
   { text: "The next day, his teacher Mrs Lim brought out special blocks. This flat square has 100 tiny cubes! A long stick has 10 cubes. And this small cube is just 1. She built 253, 2 flats, 5 sticks, and 3 cubes.", style: 'statement' },
   { text: "Now Wei Ming understood, every digit has a position, and that position gives it a special value! Ones, tens, hundreds, thousands, each place is ten times bigger than the one before.", style: 'statement' },
 
@@ -79,17 +79,17 @@ if (!fs.existsSync(AUDIO_DIR)) {
 
 async function generateAudio() {
   const audioMap = {};
-  
+
   for (let i = 0; i < phrases.length; i++) {
     const { text, style } = phrases[i];
-    
+
     // Create a safe filename
     const safeText = text.replace(/[^a-z0-9]/gi, '_').toLowerCase().slice(0, 30);
     const filename = `audio_${safeText}_${i}.mp3`;
     const filepath = path.join(AUDIO_DIR, filename);
-    
+
     audioMap[text] = `/assets/audio/${filename}`;
-    
+
     if (fs.existsSync(filepath)) {
       console.log(`Skipping existing: ${text}`);
       continue;
@@ -124,7 +124,7 @@ async function generateAudio() {
       const arrayBuffer = await response.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
       fs.writeFileSync(filepath, buffer);
-      
+
       // small delay to avoid rate limiting
       await new Promise(resolve => setTimeout(resolve, 300));
     } catch (err) {
