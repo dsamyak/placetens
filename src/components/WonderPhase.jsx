@@ -5,30 +5,35 @@ import { wonderNarration } from '../utils/narration';
 const WONDER_QUESTIONS = [
   {
     question: "Why does the '3' in 30 mean something different from the '3' in 3?",
+    spoken: "Why does the digit 3 in thirty mean something different from the digit 3 in three?",
     subtext: "What if every digit has a secret power depending on WHERE it sits?",
     emoji: "🤔",
     bgEmojis: ["🔢", "🤔", "💡", "✨"],
   },
   {
     question: "If you swap the digits of 35 to make 53, why does the number get bigger?",
+    spoken: "If you swap the digits of thirty-five to make fifty-three, why does the number get bigger?",
     subtext: "The same digits, but a completely different number! How is that possible?",
     emoji: "🔄",
     bgEmojis: ["🔄", "🔢", "⭐", "🎯"],
   },
   {
     question: "How can you build the number 247 using only tens sticks and unit cubes?",
+    spoken: "How can you build the number two hundred forty-seven using only tens sticks and unit cubes?",
     subtext: "What if numbers are like buildings — made from different sized blocks?",
     emoji: "🧱",
     bgEmojis: ["🧱", "🏗️", "💎", "🔍"],
   },
   {
     question: "Why is the number 1000 written with four digits, but it means just one thousand?",
+    spoken: "Why is the number one thousand written with four digits, but it means just one thousand?",
     subtext: "There must be a pattern to how digits work together!",
     emoji: "🎯",
     bgEmojis: ["🎯", "🚀", "💫", "🌟"],
   },
   {
     question: "If you have 4 hundreds, 2 tens, and 5 ones, what treasure number have you created?",
+    spoken: "If you have four hundreds, two tens, and five ones, what treasure number have you created?",
     subtext: "Numbers are like treasure chests — let's discover what's inside!",
     emoji: "💎",
     bgEmojis: ["💎", "🏆", "🎉", "🌈"],
@@ -40,6 +45,19 @@ export default function WonderPhase({ onComplete, audioEnabled }) {
   const [stage, setStage] = useState(0); // 0=intro, 1=question revealed, 2=sparkle
   const [particles, setParticles] = useState([]);
   const [isNarrating, setIsNarrating] = useState(false);
+
+  const playWonderAudio = useCallback(async () => {
+    stopNarration();
+    const segments = wonderNarration(wonder.question, wonder.subtext, wonder.spoken);
+    preloadNarration(segments);
+    setIsNarrating(true);
+    try {
+      await narrate(segments, audioEnabled);
+    } catch (e) {
+      console.warn('Wonder narration error:', e);
+    }
+    setIsNarrating(false);
+  }, [audioEnabled, wonder]);
 
   useEffect(() => {
     // Generate floating particles
@@ -57,39 +75,24 @@ export default function WonderPhase({ onComplete, audioEnabled }) {
 
   // Auto-start narration when phase loads
   useEffect(() => {
-    const segments = wonderNarration(wonder.question);
+    // Reveal question card and discover button
+    const revealTimer = setTimeout(() => {
+      setStage(2); // Reveal question & button
+    }, 400);
 
-    // Preload all segments immediately
-    preloadNarration(segments);
-
-    // Start narration after a brief delay for visual entrance
-    const timer = setTimeout(async () => {
-      setStage(1); // Reveal question card visually
-
+    // Start narration concurrently
+    const audioTimer = setTimeout(() => {
       if (audioEnabled) {
-        setIsNarrating(true);
-        await narrate(segments, true, {
-          onSegmentStart: (seg, idx) => {
-            // When the question segment starts, ensure card is visible
-            if (idx === 1) setStage(1);
-          },
-          onSegmentEnd: (seg, idx) => {
-            // After the last segment, show the Discover button
-            if (idx === segments.length - 1) setStage(2);
-          },
-        });
-        setIsNarrating(false);
-      } else {
-        // No audio — just reveal stages on timers
-        setTimeout(() => setStage(2), 1200);
+        playWonderAudio();
       }
-    }, 800);
+    }, 600);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(revealTimer);
+      clearTimeout(audioTimer);
       stopNarration();
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [audioEnabled, playWonderAudio]);
 
   const handleDiscover = useCallback(() => {
     stopNarration();
@@ -138,11 +141,18 @@ export default function WonderPhase({ onComplete, audioEnabled }) {
           <div className="wonder-emoji">{wonder.emoji}</div>
           <h2 className="wonder-question-text">{wonder.question}</h2>
           <p className="wonder-subtext">{wonder.subtext}</p>
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={playWonderAudio}
+            style={{ marginTop: 16, fontSize: '0.95rem' }}
+          >
+            🔊 {isNarrating ? 'Reading Aloud...' : 'Listen Again'}
+          </button>
         </div>
 
-        {/* Discover button — appears after narration completes */}
+        {/* Discover button — visible as soon as content reveals */}
         <button
-          className={`btn btn-wonder ${stage >= 2 ? 'visible' : ''}`}
+          className={`btn btn-wonder ${stage >= 1 ? 'visible' : ''}`}
           onClick={handleDiscover}
           id="discover-btn"
         >
@@ -155,10 +165,10 @@ export default function WonderPhase({ onComplete, audioEnabled }) {
         {isNarrating && (
           <button
             className="btn btn-outline btn-sm"
-            onClick={() => { stopNarration(); setStage(2); setIsNarrating(false); }}
-            style={{ marginTop: 12, opacity: 0.7 }}
+            onClick={() => { stopNarration(); setIsNarrating(false); }}
+            style={{ marginTop: 12, opacity: 0.8 }}
           >
-            Skip ⏭
+            Skip Narration ⏭
           </button>
         )}
       </div>

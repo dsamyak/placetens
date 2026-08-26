@@ -62,7 +62,7 @@ export default function PlayPhase({ onComplete, audioEnabled }) {
     if (audioEnabled) {
       const segments = playWorldNarration(WORLDS[worldId].name);
       preloadNarration(segments);
-      narrate(segments, true);
+      narrate(segments, audioEnabled);
     }
   }, [audioEnabled]);
 
@@ -133,7 +133,7 @@ export default function PlayPhase({ onComplete, audioEnabled }) {
   // Read question text aloud when a new question appears
   useEffect(() => {
     if (q && audioEnabled && currentWorld >= 0 && !worldComplete) {
-      speak(q.questionText, true, 'question');
+      speak(q.questionText, audioEnabled, 'question');
     }
   }, [qIndex, q, audioEnabled, currentWorld, worldComplete]);
 
@@ -143,7 +143,7 @@ export default function PlayPhase({ onComplete, audioEnabled }) {
     return (
       <div className="play-phase">
         <div className="play-header">
-          <h2 className="play-title">🎮 Play — Choose Your World!</h2>
+          <h2 className="play-title">🎮 Practice — Choose Your World!</h2>
           <p className="play-subtitle">Beat each world to unlock the next one. Earn stars and XP!</p>
           {totalXP > 0 && <div className="play-xp-badge">⭐ {totalXP} XP</div>}
         </div>
@@ -164,7 +164,7 @@ export default function PlayPhase({ onComplete, audioEnabled }) {
                     <span className="world-score">{completed.score}/{completed.total}</span>
                   </div>
                 )}
-                {unlocked && !completed && <div className="world-play-btn">▶ PLAY</div>}
+                {unlocked && !completed && <div className="world-play-btn">▶ PRACTICE</div>}
               </div>
             );
           })}

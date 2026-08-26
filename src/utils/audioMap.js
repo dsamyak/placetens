@@ -1,35 +1,3 @@
-export const audioMap = {
-  "Welcome to Place Value Tens and Ones!": "/assets/audio/audio_welcome_to_place_value_tens_an_0.mp3",
-  "Ready to discover the secret of numbers?": "/assets/audio/audio_ready_to_discover_the_secret_o_1.mp3",
-  "Join Wei Ming on a journey to understand place value.": "/assets/audio/audio_join_wei_ming_on_a_journey_to__2.mp3",
-  "How every digit in a number has its own special position and value!": "/assets/audio/audio_how_every_digit_in_a_number_ha_3.mp3",
-  "Hmm, I wonder...": "/assets/audio/audio_hmm__i_wonder____4.mp3",
-  "Let's find out together!": "/assets/audio/audio_let_s_find_out_together__5.mp3",
-  "Why does the '3' in 30 mean something different from the '3' in 3?": "/assets/audio/audio_why_does_the__3__in_30_mean_so_6.mp3",
-  "If you swap the digits of 35 to make 53, why does the number get bigger?": "/assets/audio/audio_if_you_swap_the_digits_of_35_t_7.mp3",
-  "How can you build the number 247 using only tens sticks and unit cubes?": "/assets/audio/audio_how_can_you_build_the_number_2_8.mp3",
-  "Why is the number 1000 written with four digits, but it means just one thousand?": "/assets/audio/audio_why_is_the_number_1000_written_9.mp3",
-  "If you have 4 hundreds, 2 tens, and 5 ones, what treasure number have you created?": "/assets/audio/audio_if_you_have_4_hundreds__2_tens_10.mp3",
-  "One morning, Wei Ming looked at the school building. Our classroom is on floor 3, he said. But on the noticeboard, he saw the number 30. Wait, why does the 3 in 30 mean something different from the 3 in floor 3?": "/assets/audio/audio_one_morning__wei_ming_looked_a_11.mp3",
-  "After school, Wei Ming went to the market. The stall uncle was selling ice cream sticks. I bundle them in groups of 10, he explained. So 4 bundles and 9 loose sticks means you have 49 sticks!": "/assets/audio/audio_after_school__wei_ming_went_to_12.mp3",
-  "The next day, his teacher Mrs Lim brought out special blocks. This flat square has 100 tiny cubes! A long stick has 10 cubes. And this small cube is just 1. She built 253, 2 flats, 5 sticks, and 3 cubes.": "/assets/audio/audio_the_next_day__his_teacher_mrs__13.mp3",
-  "Now Wei Ming understood, every digit has a position, and that position gives it a special value! Ones, tens, hundreds, thousands, each place is ten times bigger than the one before.": "/assets/audio/audio_now_wei_ming_understood__every_14.mp3",
-  "Welcome to Tens and Ones!": "/assets/audio/audio_welcome_to_tens_and_ones__15.mp3",
-  "Build numbers with tens sticks and unit cubes.": "/assets/audio/audio_build_numbers_with_tens_sticks_16.mp3",
-  "Welcome to Hundreds!": "/assets/audio/audio_welcome_to_hundreds__17.mp3",
-  "Now add hundreds flats to build bigger numbers!": "/assets/audio/audio_now_add_hundreds_flats_to_buil_18.mp3",
-  "Welcome to Thousands!": "/assets/audio/audio_welcome_to_thousands__19.mp3",
-  "Add thousands cubes for really big numbers!": "/assets/audio/audio_add_thousands_cubes_for_really_20.mp3",
-  "Welcome to Expanded Form!": "/assets/audio/audio_welcome_to_expanded_form__21.mp3",
-  "Match numbers to their expanded form!": "/assets/audio/audio_match_numbers_to_their_expande_22.mp3",
-  "Welcome to Tens Village!": "/assets/audio/audio_welcome_to_tens_village__23.mp3",
-  "Welcome to Hundreds Heights!": "/assets/audio/audio_welcome_to_hundreds_heights__24.mp3",
-  "Welcome to Thousands Galaxy!": "/assets/audio/audio_welcome_to_thousands_galaxy__25.mp3",
-  "Answer questions to earn stars and XP!": "/assets/audio/audio_answer_questions_to_earn_stars_26.mp3",
-  "Let's look back at what you learned today!": "/assets/audio/audio_let_s_look_back_at_what_you_le_27.mp3",
-  "Can you teach the mascot about place value?": "/assets/audio/audio_can_you_teach_the_mascot_about_28.mp3",
-  "Amazing job!": "/assets/audio/audio_amazing_job__29.mp3",
-  "You completed the entire journey!": "/assets/audio/audio_you_completed_the_entire_journ_30.mp3",
-  "You are a Place Value superstar!": "/assets/audio/audio_you_are_a_place_value_supersta_31.mp3",
-  "Great explanation!": "/assets/audio/audio_great_explanation__32.mp3"
-};
+// Static audio mapping override — set to empty so ElevenLabs API is used for live TTS narration with voice Shivam (Voice ID: Xb7hH8MSUJpSbSDYk0k2)
+export const audioMap = {};
+
