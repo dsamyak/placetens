@@ -2,16 +2,16 @@ const JOURNEY_PHASES = [
   { icon: '🔍', label: 'Wonder', desc: 'Spark your curiosity' },
   { icon: '📖', label: 'Story', desc: 'Hear the tale' },
   { icon: '🧪', label: 'Simulate', desc: 'Explore & discover' },
-  { icon: '🎮', label: 'Play', desc: 'Test your skills' },
+  { icon: '🎮', label: 'Practice', desc: 'Test your skills' },
   { icon: '📓', label: 'Reflect', desc: 'What did you learn?' },
 ];
 
-export default function IntroScreen({ onStart, audioEnabled, onToggleAudio }) {
+export default function IntroScreen({ onStart }) {
   return (
     <div className="intro-screen">
       {/* Curriculum badge */}
       <div className="intro-badge">
-        ✨· Grade 1 Maths
+        ✨ Grade 3 Maths
       </div>
 
       {/* Title */}
@@ -30,7 +30,7 @@ export default function IntroScreen({ onStart, audioEnabled, onToggleAudio }) {
 
       {/* Description */}
       <p className="intro-desc">
-        Join Wei Ming on a journey to understand place value — how every digit in a number has its own special position and value, from ones to thousands!
+        Join Shivam on a journey to understand place value — how every digit in a number has its own special position and value, from ones to thousands!
       </p>
 
       {/* Journey map */}

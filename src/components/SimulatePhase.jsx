@@ -299,7 +299,7 @@ function Station4({ audioEnabled, onComplete }) {
         }}
         style={{ marginTop: 16, position: 'relative', zIndex: 10 }}
       >
-        {allMatched ? '✅ Continue to Play Phase →' : 'Skip to Play →'}
+        {allMatched ? '✅ Continue to Practice Phase →' : 'Skip to Practice →'}
       </button>
     </div>
   );
@@ -314,7 +314,7 @@ export default function SimulatePhase({ onComplete, audioEnabled }) {
     const segments = simulateStationNarration(station);
     if (segments.length > 0 && audioEnabled) {
       preloadNarration(segments);
-      narrate(segments, true);
+      narrate(segments, audioEnabled);
     }
     return () => stopNarration();
   }, [station, audioEnabled]);
@@ -353,9 +353,15 @@ export default function SimulatePhase({ onComplete, audioEnabled }) {
       </div>
       <div className="progress-dots">
         {STATIONS.map((s, i) => (
-          <div key={i} className="simulate-dot-wrapper">
+          <div
+            key={i}
+            className="simulate-dot-wrapper"
+            onClick={() => { stopNarration(); setStation(i); }}
+            style={{ cursor: 'pointer' }}
+            title={`Jump to station: ${s.title}`}
+          >
             <div className={`progress-dot ${i === station ? 'active' : i < station ? 'completed' : ''}`} />
-            <span className="simulate-dot-label">{s.icon}</span>
+            <span className="simulate-dot-label">{s.icon} {s.title}</span>
           </div>
         ))}
       </div>

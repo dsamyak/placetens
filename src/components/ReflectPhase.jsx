@@ -46,10 +46,10 @@ export default function ReflectPhase({ stats, onRestart, onGoHome, audioEnabled 
     if (audioEnabled) {
       const segments = reflectNarration();
       preloadNarration(segments);
-      narrate(segments, true);
+      narrate(segments, audioEnabled);
     }
     return () => stopNarration();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [audioEnabled]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (showConfetti) {
@@ -67,7 +67,7 @@ export default function ReflectPhase({ stats, onRestart, onGoHome, audioEnabled 
     if (step === 3 && audioEnabled) {
       const segments = celebrationNarration();
       preloadNarration(segments);
-      narrate(segments, true);
+      narrate(segments, audioEnabled);
     }
     return () => { if (step === 3) stopNarration(); };
   }, [step, audioEnabled]);

@@ -6,10 +6,10 @@ function Visual({ question }) {
 
   if (question.visual === 'tenframe') {
     return (
-      <div className="ten-frame" style={{ pointerEvents: 'none', marginBottom: 16 }}>
+      <div className="ten-frame" style={{ pointerEvents: 'none', marginBottom: 16, maxWidth: 340 }}>
         {Array.from({ length: 10 }, (_, i) => (
           <div key={i} className={`ten-frame-cell ${i < question.visualCount ? 'filled' : ''}`}
-            style={{ width: 40, height: 40 }}>
+            style={{ width: 46, height: 46, fontSize: '1.8rem' }}>
             {i < question.visualCount ? '⭐' : ''}
           </div>
         ))}
@@ -19,20 +19,20 @@ function Visual({ question }) {
 
   if (question.visual === 'blocks') {
     return (
-      <div className="blocks-area" style={{ minHeight: 120, marginBottom: 16 }}>
+      <div className="blocks-area" style={{ minHeight: 140, marginBottom: 16 }}>
         <div className="tens-column">
           <div className="column-label">Tens</div>
-          <div style={{ display: 'flex', gap: 4 }}>
+          <div style={{ display: 'flex', gap: 6 }}>
             {Array.from({ length: question.visualTens || 0 }, (_, i) => (
-              <div key={i} className="ten-stick" style={{ height: 80 }} />
+              <div key={i} className="ten-stick" style={{ height: 110, width: 34 }} />
             ))}
           </div>
         </div>
         <div className="ones-column">
           <div className="column-label">Ones</div>
-          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', maxWidth: 100 }}>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', maxWidth: 120 }}>
             {Array.from({ length: question.visualOnes || 0 }, (_, i) => (
-              <div key={i} className="unit-cube" />
+              <div key={i} className="unit-cube" style={{ width: 34, height: 34 }} />
             ))}
           </div>
         </div>
@@ -44,9 +44,9 @@ function Visual({ question }) {
     const emojis = { apples: '🍎', stickers: '⭐', marbles: '🔵', crayons: '🖍️', stars: '⭐', books: '📚', toys: '🧸', coins: '🪙', shells: '🐚', flowers: '🌸' };
     const emoji = emojis[question.visualObject] || '⭐';
     return (
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', margin: '12px 0 20px', maxWidth: 300, marginLeft: 'auto', marginRight: 'auto' }}>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', margin: '14px 0 24px', maxWidth: 360, marginLeft: 'auto', marginRight: 'auto' }}>
         {Array.from({ length: question.visualCount }, (_, i) => (
-          <span key={i} style={{ fontSize: '1.8rem', animation: `bounceIn ${0.2 + i * 0.05}s ease` }}>{emoji}</span>
+          <span key={i} style={{ fontSize: '2.2rem', animation: `bounceIn ${0.2 + i * 0.05}s ease` }}>{emoji}</span>
         ))}
       </div>
     );

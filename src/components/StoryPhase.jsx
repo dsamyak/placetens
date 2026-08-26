@@ -6,14 +6,14 @@ const STORY_SLIDES = [
   {
     image: '/images/story_school.png',
     title: 'The Number Mystery',
-    text: "One morning, Wei Ming looked at the school building. \"Our classroom is on floor 3,\" he said. But on the noticeboard, he saw the number 30. \"Wait... why does the 3 in 30 mean something different from the 3 in floor 3?\"",
+    text: "One morning, Shivam looked at the school building. \"Our classroom is on floor 3,\" he said. But on the noticeboard, he saw the number 30. \"Wait... why does the 3 in 30 mean something different from the 3 in floor 3?\"",
     highlight: '"The same digit, but a different value?"',
     mascotText: "Great question! Let's find out! 🔍",
   },
   {
     image: '/images/story_market.png',
     title: 'The Bundle Discovery',
-    text: "After school, Wei Ming went to the market. The stall uncle was selling ice cream sticks. \"I bundle them in groups of 10,\" he explained. \"So 4 bundles and 9 loose sticks means you have 49 sticks!\"",
+    text: "After school, Shivam went to the market. The stall uncle was selling ice cream sticks. \"I bundle them in groups of 10,\" he explained. \"So 4 bundles and 9 loose sticks means you have 49 sticks!\"",
     highlight: '"4 tens + 9 ones = 49!"',
     mascotText: "So THAT is place value! 💡",
   },
@@ -27,7 +27,7 @@ const STORY_SLIDES = [
   {
     image: '/images/story_celebrate.png',
     title: "Let's Explore Together!",
-    text: "Now Wei Ming understood: every digit has a position, and that position gives it a special value! Ones, tens, hundreds, thousands — each place is ten times bigger than the one before.",
+    text: "Now Shivam understood: every digit has a position, and that position gives it a special value! Ones, tens, hundreds, thousands — each place is ten times bigger than the one before.",
     highlight: '"Ones → Tens → Hundreds → Thousands!"',
     mascotText: "Your turn to explore! 🚀",
   },
@@ -67,7 +67,7 @@ export default function StoryPhase({ onComplete, audioEnabled }) {
 
       const segment = narrationSegments.current[slide];
       if (segment && audioEnabled) {
-        await speak(segment.text, true, segment.style);
+        await speak(segment.text, audioEnabled, segment.style);
       }
 
       if (cancelled) return;
